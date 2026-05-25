@@ -1,54 +1,106 @@
 # UI Foundry Badge Component Generator
 
-Standalone visual badge generator built with Next.js.
+Standalone visual Badge generator built with Next.js, React, and TypeScript.
 
-This app is a focused badge-building studio for status chips, labels, counters, notification markers, and branded mini-surfaces that can be edited visually and exported as code.
+Display/status badge studio for labels, counts, dots, icons, dismiss affordances, status color systems, and compact metadata UI.
+
+This project is packaged as an independent component studio for marketplace sale while following the same UI Foundry product language used by the button generator. It keeps local shared controls, local presets, local export utilities, and no runtime dependency on another component app.
 
 ## Product summary
 
 This generator is designed for:
+- dashboard and SaaS interface designers
+- developers building notification, count, and status indicators
+- buyers who need reusable badge styling systems
 
-- designers exploring status, label, and tag treatments quickly
-- developers who want editable badge starting points for dashboards, admin panels, and product UI
-- freelancers and agencies building notification and metadata surfaces for clients
-- buyers who want a dedicated badge tool with the same UX language as the rest of UI Foundry
+The intended workflow is:
+
+1. choose a preset or start from the default state
+2. edit the component through sectioned controls
+3. inspect the live preview in the shared dark studio canvas
+4. switch to code view when needed
+5. copy or download the generated React output
 
 ## What the product includes
 
-- section-based editing controls
+- standalone Next.js app structure
+- section-based editor shell
+- local shared controls for color, typography, inputs, sliders, switches, sections, and preview/download panels
 - live preview panel
 - code view with copy support
-- file export support
-- searchable preset library
-- generated premium preset catalog with filters, paging, and surprise-me apply
-- undo and redo controls
-- self-contained standalone app structure
+- React-only export path
+- download filename control
+- preview background controls
+- preset application flow with full-state updates
+- accessibility and state-preview guidance where native to the component
+- self-contained package files for independent repo publishing
 
-## Editing coverage
+## Native editing surface
 
-The editor currently includes these control areas:
+The editor is focused on controls that are native to Badge and useful in real product work:
+- label, count, dot, icon, dismiss, and status badge content modes
+- max count, show-zero, invisible, anchor, origin, and overlap patterns
+- typography, density, radius, border, shadow, and material controls
+- interactive and dismiss preview only where the export remains honest
+- accessible descriptions for non-text or status-only badges
 
-- Presets
-- Content
-- Appearance
-- Status and Dot
-- Effects
-- 3D Engine
-- A11y
+The goal is maximum useful depth without adding unrelated controls that would make the component stop reading as Badge.
 
-These sections cover label content, icon and counter presentation, appearance and shape, status-dot behavior, effects and depth styling, and accessibility metadata.
+## Preset model
+
+Presets are treated as full editor states, not just color swaps. The suite-wide preset contract is:
+
+- family
+- archetype
+- variant
+- size
+- tags
+- state
+
+Applying a preset should update the complete editable state and reset transient preview state so the preview and export stay aligned.
 
 ## Export workflow
 
-The badge preview and code output stay tied to the same current state so the exported result matches the visual editor closely.
+The shipped export contract is React-only. The live preview, visible code, copied code, and downloaded file are expected to come from the same current React payload so users do not see one result and export another.
 
-## Why this product is useful
+## Consistency contract
 
-This is not a single prebuilt chip. It is an editable badge studio for status labels, counters, and UI markers that can be tuned to different product directions.
+This studio is intentionally structured to be both independently sellable and merge-ready for a future UI Foundry SaaS product:
 
-## Tech
+- no runtime imports from button-component
+- no runtime imports from shared-templates
+- no runtime imports from another component studio
+- common editing tasks use the same local control patterns as the button canon
+- shared state names such as previewResetKey, previewBgMode, previewBgInput, and downloadName are preserved where applicable
+
+## Tech stack
 
 - Next.js
 - React
 - TypeScript
+- Tailwind CSS
+- local component/editor utilities
 
+## Commands
+
+    npm install
+    npm run typecheck
+    npm run lint -- --quiet
+    npm run build
+    npm run dev
+
+## Verification checklist
+
+Before publishing a new version, verify:
+
+- install completes without dependency errors
+- typecheck passes
+- lint has no blocking errors
+- production build completes
+- preview and generated React code match
+- copied code and downloaded code match the visible code
+- no generated node_modules, .next, or build artifacts are committed
+
+## Repository
+
+This repo is intended to publish as Abid-Al-Hossain/UI_badge.
