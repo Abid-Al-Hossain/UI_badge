@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Canvas } from "@react-three/fiber";
 import { Float } from "@react-three/drei";
 import {
@@ -95,6 +95,13 @@ export default function LivePreview({ state }: { state: BadgeState }) {
     { id: number; x: number; y: number; size: number }[]
   >([]);
   const rippleIdRef = useRef(0);
+  const rippleTimersRef = useRef<Set<ReturnType<typeof setTimeout>>>(new Set());
+
+  useEffect(() => {
+    return () => {
+      rippleTimersRef.current.forEach(clearTimeout);
+    };
+  }, []);
 
   // --- Compute Styles ---
   const getVariantStyles = () => {
@@ -192,9 +199,11 @@ export default function LivePreview({ state }: { state: BadgeState }) {
       },
     ]);
 
-    window.setTimeout(() => {
+    const timer = setTimeout(() => {
       setRipples((current) => current.filter((ripple) => ripple.id !== id));
+      rippleTimersRef.current.delete(timer);
     }, 520);
+    rippleTimersRef.current.add(timer);
   };
 
   const renderIcon = () => {
