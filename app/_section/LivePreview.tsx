@@ -67,6 +67,19 @@ export default function LivePreview({ state }: { state: BadgeState }) {
     ariaLabel,
     ariaRole,
     ariaLive,
+    borderStyle,
+    disabled,
+    disabledOpacity,
+    disabledCursor,
+    transitionDuration,
+    transitionEasing,
+    focusRingEnabled,
+    focusRingWidth,
+    focusRingColor,
+    hoverBgColor,
+    hoverTextColor,
+    letterSpacing,
+    textTransform,
   } = state;
 
   const sizeScale = BADGE_SIZE_SCALE[size] ?? 1;
@@ -96,6 +109,8 @@ export default function LivePreview({ state }: { state: BadgeState }) {
   >([]);
   const rippleIdRef = useRef(0);
   const rippleTimersRef = useRef<Set<ReturnType<typeof setTimeout>>>(new Set());
+  const [isBadgeHovered, setIsBadgeHovered] = useState(false);
+  const [isBadgeFocused, setIsBadgeFocused] = useState(false);
 
   useEffect(() => {
     return () => {
@@ -108,7 +123,7 @@ export default function LivePreview({ state }: { state: BadgeState }) {
     switch (variant) {
       case "outline":
         return {
-          border: `${scaledBorderWidth}px solid ${color}`,
+          border: `${scaledBorderWidth}px ${borderStyle} ${color}`,
           color: color,
           background: "transparent",
         };
@@ -153,12 +168,14 @@ export default function LivePreview({ state }: { state: BadgeState }) {
     padding: `${scaledPaddingY}px ${scaledPaddingX}px`,
     fontSize: `${scaledFontSize}px`,
     fontWeight: 600,
+    letterSpacing: `${letterSpacing}px`,
+    textTransform,
     borderRadius: shapeRadius,
     fontFamily: "Inter, sans-serif",
-    cursor: interactive ? "pointer" : "default",
+    cursor: disabled ? disabledCursor : interactive ? "pointer" : "default",
     position: "relative",
     overflow: "hidden", // for ripple
-    transition: "all 0.2s ease",
+    transition: transitionDuration > 0 ? `all ${transitionDuration}ms ${transitionEasing}` : "none",
     ...getVariantStyles(),
   };
 
@@ -168,6 +185,21 @@ export default function LivePreview({ state }: { state: BadgeState }) {
 
   if (dropShadow && variant !== "neumorphic") {
     baseStyle.boxShadow = `0px 4px ${scaledShadowBlur}px ${shadowColor}`;
+  }
+
+  if (interactive && isBadgeHovered && !disabled) {
+    baseStyle.background = hoverBgColor;
+    baseStyle.color = hoverTextColor;
+  }
+
+  if (isBadgeFocused && focusRingEnabled) {
+    baseStyle.outline = `${focusRingWidth}px solid ${focusRingColor}`;
+    baseStyle.outlineOffset = 2;
+  }
+
+  if (disabled) {
+    baseStyle.opacity = disabledOpacity;
+    baseStyle.pointerEvents = "none";
   }
 
   // --- Tilt Logic (Simple CSS 3D) ---
@@ -229,10 +261,15 @@ export default function LivePreview({ state }: { state: BadgeState }) {
     <div className="w-full h-full min-h-[300px] flex items-center justify-center relative">
       <motion.div
         onMouseMove={handleMouseMove}
-        onMouseLeave={handleMouseLeave}
+        onMouseLeave={() => { handleMouseLeave(); setIsBadgeHovered(false); }}
+        onMouseEnter={() => setIsBadgeHovered(true)}
+        onFocus={() => setIsBadgeFocused(true)}
+        onBlur={() => setIsBadgeFocused(false)}
         onPointerDown={triggerRipple}
-        whileHover={interactive ? { scale: hoverScale } : {}}
-        whileTap={interactive ? { scale: clickRipple ? 0.97 : 0.98 } : {}}
+        whileHover={interactive && !disabled ? { scale: hoverScale } : {}}
+        whileTap={interactive && !disabled ? { scale: clickRipple ? 0.97 : 0.98 } : {}}
+        tabIndex={disabled ? -1 : interactive || dismissible ? 0 : undefined}
+        aria-disabled={disabled || undefined}
         role={ariaRole === "none" ? undefined : ariaRole}
         aria-label={ariaLabel || undefined}
         aria-live={ariaRole === "none" ? undefined : ariaLive}

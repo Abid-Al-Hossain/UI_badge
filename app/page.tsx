@@ -27,6 +27,7 @@ import BadgeSizingSection from "./_section/BadgeSizingSection";
 import BadgeTypographySection from "./_section/BadgeTypographySection";
 import BadgeMetadataSection from "./_section/BadgeMetadataSection";
 import BadgeInteractionSection from "./_section/BadgeInteractionSection";
+import BadgeStatesSection from "./_section/BadgeStatesSection";
 import BadgeMotionSection from "./_section/BadgeMotionSection";
 import StatusSection from "./_section/StatusSection";
 import EffectsSection from "./_section/EffectsSection";
@@ -114,6 +115,19 @@ export default function BadgePage() {
     interactive,
     hoverScale,
     clickRipple,
+    borderStyle,
+    disabled,
+    disabledOpacity,
+    disabledCursor,
+    transitionDuration,
+    transitionEasing,
+    focusRingEnabled,
+    focusRingWidth,
+    focusRingColor,
+    hoverBgColor,
+    hoverTextColor,
+    letterSpacing,
+    textTransform,
     ariaLabel,
     ariaRole,
     ariaLive,
@@ -175,6 +189,19 @@ export default function BadgePage() {
       interactive,
       hoverScale,
       clickRipple,
+      borderStyle,
+      disabled,
+      disabledOpacity,
+      disabledCursor,
+      transitionDuration,
+      transitionEasing,
+      focusRingEnabled,
+      focusRingWidth,
+      focusRingColor,
+      hoverBgColor,
+      hoverTextColor,
+      letterSpacing,
+      textTransform,
       ariaLabel,
       ariaRole,
       ariaLive,
@@ -220,6 +247,19 @@ export default function BadgePage() {
     interactive,
     hoverScale,
     clickRipple,
+    borderStyle,
+    disabled,
+    disabledOpacity,
+    disabledCursor,
+    transitionDuration,
+    transitionEasing,
+    focusRingEnabled,
+    focusRingWidth,
+    focusRingColor,
+    hoverBgColor,
+    hoverTextColor,
+    letterSpacing,
+    textTransform,
     ariaLabel,
     ariaRole,
     ariaLive,
@@ -384,6 +424,11 @@ export default function BadgePage() {
           setDismissible={makeSetter("dismissible")}
         />
       ),
+    },
+    {
+      id: "states",
+      label: "States",
+      content: <BadgeStatesSection state={state} makeSetter={makeSetter} />,
     },
     {
       id: "motion",

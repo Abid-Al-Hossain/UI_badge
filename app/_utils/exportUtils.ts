@@ -30,6 +30,7 @@ function getBadgeVariantStyles(params: {
   color: string;
   textColor: string;
   borderWidth: number;
+  borderStyle: string;
   dropShadow: boolean;
   shadowColor: string;
   shadowBlur: number;
@@ -43,6 +44,7 @@ function getBadgeVariantStyles(params: {
     color,
     textColor,
     borderWidth,
+    borderStyle,
     dropShadow,
     shadowColor,
     shadowBlur,
@@ -55,7 +57,7 @@ function getBadgeVariantStyles(params: {
   const styles = {
     background: color,
     color: textColor,
-    border: `${borderWidth}px solid ${color}`,
+    border: `${borderWidth}px ${borderStyle} ${color}`,
     boxShadow: "none",
     backdropFilter: undefined as string | undefined,
     WebkitBackdropFilter: undefined as string | undefined,
@@ -151,6 +153,19 @@ export type BadgeExportInput = {
   interactive: boolean;
   hoverScale: number;
   clickRipple: boolean;
+  borderStyle: BadgeState["borderStyle"];
+  disabled: boolean;
+  disabledOpacity: number;
+  disabledCursor: BadgeState["disabledCursor"];
+  transitionDuration: number;
+  transitionEasing: BadgeState["transitionEasing"];
+  focusRingEnabled: boolean;
+  focusRingWidth: number;
+  focusRingColor: string;
+  hoverBgColor: string;
+  hoverTextColor: string;
+  letterSpacing: number;
+  textTransform: BadgeState["textTransform"];
   ariaLabel?: string;
   ariaRole?: BadgeState["ariaRole"];
   ariaLive?: BadgeState["ariaLive"];
@@ -198,6 +213,19 @@ export function buildBadgeExportPayload(params: BadgeExportInput) {
     hoverScale,
     clickRipple,
     icon3DSpinSpeed,
+    borderStyle,
+    disabled,
+    disabledOpacity,
+    disabledCursor,
+    transitionDuration,
+    transitionEasing,
+    focusRingEnabled,
+    focusRingWidth,
+    focusRingColor,
+    hoverBgColor,
+    hoverTextColor,
+    letterSpacing,
+    textTransform,
     ariaLabel,
     ariaRole,
     ariaLive,
@@ -226,6 +254,7 @@ export function buildBadgeExportPayload(params: BadgeExportInput) {
     color,
     textColor,
     borderWidth: scaledBorderWidth,
+    borderStyle,
     dropShadow,
     shadowColor,
     shadowBlur: scaledShadowBlur,
@@ -247,7 +276,9 @@ export function buildBadgeExportPayload(params: BadgeExportInput) {
   const reactIconName = reactIconMap[iconName] ?? "Star";
   const dismissIconSize = Math.max(12, Math.round(scaledIconSize * 0.72));
   const icon3dGeometryJsx = getGeometryJsx(icon3DGeometry);
-  const needsHooks = tiltEnabled || clickRipple;
+  const focusable = interactive || dismissible;
+  const needsState = interactive || (focusRingEnabled && focusable);
+  const needsHooks = tiltEnabled || clickRipple || needsState;
   const needsMotion = interactive || tiltEnabled || clickRipple;
   const wrapperTag = needsMotion ? "motion.div" : "div";
   const ariaProps =
@@ -270,7 +301,9 @@ import { Float } from "@react-three/drei";` : ""}
 
 export default function Badge() {
 ${needsHooks ? `
-  const ref = useRef<HTMLDivElement | null>(null);
+  ${tiltEnabled || clickRipple ? "const ref = useRef<HTMLDivElement | null>(null);" : ""}
+  ${interactive ? "const [hovered, setHovered] = useState(false);" : ""}
+  ${focusRingEnabled && focusable ? "const [focused, setFocused] = useState(false);" : ""}
   ${clickRipple ? "const [ripples, setRipples] = useState<{ id: number; x: number; y: number; size: number }[]>([]);" : ""}
   ${clickRipple ? "const rippleId = useRef(0);" : ""}
   ${tiltEnabled ? `const handleMove = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -307,10 +340,15 @@ ${needsHooks ? `
 
   return (
     <${wrapperTag}
-      ${needsHooks ? "ref={ref}" : ""}
-      ${tiltEnabled ? "onMouseMove={handleMove} onMouseLeave={handleLeave}" : ""}
+      ${tiltEnabled || clickRipple ? "ref={ref}" : ""}
+      ${tiltEnabled ? "onMouseMove={handleMove}" : ""}
+      ${interactive ? "onMouseEnter={() => setHovered(true)}" : ""}
+      onMouseLeave={() => {${tiltEnabled ? " handleLeave();" : ""}${interactive ? " setHovered(false);" : ""}}}
+      ${focusRingEnabled && focusable ? "onFocus={() => setFocused(true)} onBlur={() => setFocused(false)}" : ""}
       ${clickRipple ? "onPointerDown={handlePointerDown}" : ""}
-      ${interactive ? `whileHover={{ scale: ${hoverScale} }} whileTap={{ scale: ${clickRipple ? 0.97 : 0.98} }}` : ""}
+      ${interactive ? `whileHover={${disabled ? "{}" : `{ scale: ${hoverScale} }`}} whileTap={${disabled ? "{}" : `{ scale: ${clickRipple ? 0.97 : 0.98} }`}}` : ""}
+      ${focusable ? `tabIndex={${disabled ? -1 : 0}}` : ""}
+      ${disabled ? "aria-disabled={true}" : ""}
       ${ariaProps}
       ${labelProp}
       style={{
@@ -321,16 +359,20 @@ ${needsHooks ? `
         padding: "${scaledPaddingY}px ${scaledPaddingX}px",
         fontSize: "${scaledFontSize}px",
         fontWeight: 600,
+        letterSpacing: "${letterSpacing}px",
+        textTransform: "${textTransform}",
         borderRadius: "${scaledBorderRadius}",
         fontFamily: "Inter, sans-serif",
-        cursor: "${interactive ? "pointer" : "default"}",
+        cursor: "${disabled ? disabledCursor : interactive ? "pointer" : "default"}",
         position: "relative",
         overflow: "hidden",
-        transition: "transform 0.2s ease, box-shadow 0.2s ease",
-        background: "${variantStyles.background}",
-        color: "${variantStyles.color}",
+        transition: ${transitionDuration > 0 ? `"all ${transitionDuration}ms ${transitionEasing}"` : `"none"`},
+        background: ${interactive ? `hovered && !${disabled} ? "${hoverBgColor}" : "${variantStyles.background}"` : `"${variantStyles.background}"`},
+        color: ${interactive ? `hovered && !${disabled} ? "${hoverTextColor}" : "${variantStyles.color}"` : `"${variantStyles.color}"`},
         border: "${variantStyles.border}",
         boxShadow: "${variantStyles.boxShadow}",
+        opacity: ${disabled ? disabledOpacity : 1},
+        ${focusRingEnabled && focusable ? `outline: focused ? "${focusRingWidth}px solid ${focusRingColor}" : "none", outlineOffset: 2,` : ""}
         ${variantStyles.backdropFilter ? `backdropFilter: "${variantStyles.backdropFilter}",` : ""}
         ${variantStyles.WebkitBackdropFilter ? `WebkitBackdropFilter: "${variantStyles.WebkitBackdropFilter}",` : ""}
         ${use3D || tiltEnabled ? `transform: "perspective(1000px)${tiltEnabled ? "" : ` translateZ(${scaledDepth}px)`}", transformStyle: "preserve-3d",` : ""}
