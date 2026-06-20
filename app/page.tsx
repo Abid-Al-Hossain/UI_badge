@@ -34,6 +34,7 @@ import EffectsSection from "./_section/EffectsSection";
 import ThreeBadgeSection from "./_section/ThreeBadgeSection";
 import BadgeAccessibilitySection from "./_section/BadgeAccessibilitySection";
 import { buildBadgeExportPayload } from "./_utils/exportUtils";
+import ContrastGuard from "@/components/shared/color/ContrastGuard";
 
 // --- Types ---
 // --- Types ---
@@ -531,7 +532,6 @@ export default function BadgePage() {
       code={exportCode.content}
     />
   );
-
   return (
     <AppShell contentOverflow="hidden">
       <PlaygroundLayout
@@ -540,6 +540,7 @@ export default function BadgePage() {
         controls={controls}
         preview={preview}
       />
-    </AppShell>
+
+<ContrastGuard /></AppShell>
   );
 }
