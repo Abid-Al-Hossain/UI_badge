@@ -2,7 +2,7 @@
 
 import React, { useMemo, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { SectionCard, LabeledField, Segmented } from "@/components/shared/layout/ui";
+import { SectionCard, LabeledField, FilterSelect } from "@/components/shared/layout/ui";
 import { BADGE_PRESETS, BADGE_PRESET_COUNT, type BadgePreset } from "../_data/badgePresets";
 import type { BadgeState, BadgeVariant } from "../types";
 
@@ -191,7 +191,7 @@ export default function PresetsSection({ state, applyPreset }: Props) {
           </LabeledField>
 
           <LabeledField label="Variant">
-            <Segmented
+            <FilterSelect
               value={variantFilter}
               onChange={(value) => {
                 setVariantFilter(value);
